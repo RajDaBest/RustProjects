@@ -17,6 +17,11 @@ fn main() {
 
     let x = x + 1;
 
+    // first variable is shadowed by the second variable, which means that the
+    // second variable is what the compiler will see when you use the name of the variable.
+    // in effect, the second variable overshadows the first, taking any further uses of the variable name
+    // to itself until either it is overshadowed or the overshadowing scope ends
+
     println!("Second value of x: {x}");
 
     {
