@@ -1,0 +1,14 @@
+[package]
+name = "guessing_game"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rand = "0.8.5" # any version that is at least 0.8.5 but below 0.9.0
+
+# cargo considers these versions to have public APIs compatible with version 0.8.5, and this
+# specification ensures you'll get the latest patch release that will still compile 
+# with the code Any version greater than 0.9.0 is not guaranteed to compile with the same API usage
+
+# cargo understands semantic versioning, which is the standard for writing version numbers. this behaviour
+# is exactly what semantic versioning is and cargo supports it
