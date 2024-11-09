@@ -141,6 +141,8 @@ most of the lines you've seen so far. Expressions do not include ending semicolo
 a semicolon to the end of the expressino, you turn it into a statement, and it will then not
 return a value.
 
+A block evaluates to the last expression inside them, or the unit type () if there are none.
+
 */
 
 /*
@@ -180,7 +182,7 @@ fn plus_one(x: i32) -> i32 {
 Placing a semicolon at the end of the line containing x + 1 will change it from an
 expression to a statement. A function with not tail or return expression implicitly returns the unit type, ().
 This will be an error since the function returns the unit type but claims to return an i32 in it's definition.
-This is an error of mismatchec-types.
+This is an error of mismatched-types.
 
 Statements evaluate to the unit type.
 
