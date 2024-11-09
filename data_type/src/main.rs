@@ -7,7 +7,7 @@ fn main() {
     // when we converted a string to a numeric type using parse, we must add a type
     // annotation, like this:
 
-    let guess: u32 = "42".parse().expect("Not a number!");
+    let _guess: u32 = "42".parse().expect("Not a number!");
 
     // if we don't add the : u32 type annotation, rust will display an error which shows
     // that the compiler needs more information from us to know which type we want to use
@@ -58,7 +58,8 @@ fn main() {
 
     */
 
-    let (x, y, z) = tup;
+    let (_x, y, _z) = tup; // the types of the variables inside become fixed (as shown by the gray types)
+                           // since they are now attached to tup
 
     println!("The value of y is {y}");
 
@@ -72,7 +73,7 @@ fn main() {
 
     */
 
-    let m = tup.0;
+    let _m = tup.0;
 
     /*
 
@@ -82,5 +83,63 @@ fn main() {
 
     */
 
-    let unit_tup: () = ();
+    let _unit_tup: () = ();
+
+    // _ suffix is neccessary for removing unused variable warning
+
+    /*
+
+    # The Array Type
+
+    Another way to have a collection of multiple values is with an array.
+    Unlike a tuple, every element of an array must have the same type.
+    Unlike arrays in some other languages, arrays in Rust have a fixed length.
+
+    We write the values in an array as a comma-separated list inside square brackets:
+
+    */
+
+    let _a: [u8; 5] = [1, 2, 3, 4, 5];
+
+    /*
+
+    Arrays are useful when you want your data allocated on the stack rather than the heap
+    (local arrays are on the stack and vector type is on the heap) or when you want to
+    ensure you always have a fixed number of elements.
+
+    An array isn't as flexible as the vector type, though. A vector is a similar collection
+    type provided by the standard library that is allowed to grow or shrink in size. If you're
+    unsure whether to use an array or a vector, chances are you should use a vector.
+
+    However, arrays are more useful when you know the number of elements will not need to change.
+
+    You write an array's type using square brackets with the type of each element, a semicolon, and then
+    the number of elements in the array.
+
+    You can also initialize an array to contain the same value for each element by specifying
+    the initial value, followed by a semicolon, and then the length of the array in square brackets, like:
+
+    */
+
+    let _b: [i32; 5] = [3; 5];
+
+    /*
+
+    An array is a single chunk of memory of a known, fixed size that can be allocated
+    on the stack. You can access elements of an array using zero-indexing, like this:
+
+    */
+
+    let _c: [i32; 5] = [1, 2, 3, 4, 5];
+
+    let _first: i32 = _c[0];
+    let _second: i32 = _c[1];
+
+    /*
+
+    When you attempt to access an element using indexing, Rust will check that the index you’ve specified is less than the array length. 
+    If the index is greater than or equal to the length, Rust will panic (program exits and displays the errors). 
+    This check has to happen at runtime or at compile-time (if the out-of-bounds indexing is obvious at compile-time)
+
+    */
 }
