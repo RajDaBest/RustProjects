@@ -41,15 +41,15 @@ fn main() {
     // a new variable when we use the let keyword again, we can change the type of the value but reuse the
     // same name. so this is allowed:
 
-    let spaces = "   ";
-    let spaces = spaces.len();
+    let _spaces = "   ";
+    let _spaces = _spaces.len();
 
     // the first spaces is a string type and the second spaces is a number type
 
     // the following however is an error:
 
-    let mut var = "   "
-    var = var.len();
+    // let mut var = "   "
+    // var = var.len();
 
     // the error says we are not allowed to mutate a variable's type
 }
