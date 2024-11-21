@@ -143,3 +143,9 @@ fn main() {
 
     */
 }
+
+/*  
+
+Rust also has 128-bit integral types: u128 and i128
+
+*/
