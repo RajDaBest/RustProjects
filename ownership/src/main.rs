@@ -287,11 +287,13 @@ when assigning a value to a variable. Passing a variable to a function will move
 
 */
 
-fn takes_ownership(some_string: String) { // some_string comes into scope
+fn takes_ownership(some_string: String) {
+    // some_string comes into scope
     println!("{some_string}");
 } // here, some_string goes out of scope and drop is called. the backing memory is freed
 
-fn make_copy(some_integer: i32){ // some_integer comes into scope
+fn make_copy(some_integer: i32) {
+    // some_integer comes into scope
     println!("{some_integer}");
 } // here, some_integer goes out of scope. nothing special happens
 
@@ -308,10 +310,70 @@ fn main() {
     // x afterwards.
 } // here x goes out of scope, then s. But because s's value was moved, nothing special happens
 
-/*  
+/*
 
 If we tried to use s after the call to takes_ownership, Rust would throw a compile-time error.
 These static checks protect us from mistakes.
 
 */
 
+/*
+
+Return Values and Scope
+
+Returning values can also transfer ownership.
+
+*/
+
+fn _new() {
+    let _s1 = _gives_ownership(); // gives_ownership moves it's return value into s1
+
+    let _s2 = String::from("hello"); // s2 comes into scope
+
+    let _s3 = _takes_and_gives_back(_s2); // s2 is moved into takes_and_gives_back,
+                                          // which also moves it's return value into s3
+} // here, s3 goes out of scope and is dropped. s2 was moves, so nothing happens. s1 goes out of scope and is dropped
+
+// this function takes a String and returns one
+fn _takes_and_gives_back(a_string: String) -> String {
+    // a_string comes into scope
+    a_string // a_string is returned and moves out to the calling function
+}
+
+fn _gives_ownership() -> String {
+    // gives_ownership will move it's return value into the function that calls it
+    let _some_string = String::from("yours"); // some_string comes into scope
+    _some_string // some_string is returned and moves out to the calling function
+}
+
+/*
+
+The ownership of a variable follows the same pattern every time: assigning a value to another variable moves it.
+When a variable that includes data on the heap goes out of scope, the value will be cleaned up by drop unless
+ownership of the data has been moved to another variable.
+
+While this works, taking ownership and then returning ownership with every function is a bit tedious.
+What if we want to let a function use a value but not take ownership?
+It’s quite annoying that anything we pass in also needs to be passed back if we want to use it again,
+in addition to any data resulting from the body of the function that we might want to return as well.
+
+Rust does let us return multiple values using a tuple.
+But this is too much ceremony and a lot of work for a concept that should be common. Luckily for us,
+Rust has a feature for using a value without transferring ownership, called references.
+
+*/
+
+fn __test() -> () {
+    let s1 = String::from("hello");
+
+    let (s2, len) = _calculate_length(s1);
+
+    println!("The length of '{s2}' is {len}");
+}
+
+fn _calculate_length(s: String) -> (String, usize)
+{
+    let length = s.len(); // len() returns the length of a String
+
+    (s, length)
+}
