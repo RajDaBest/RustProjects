@@ -137,15 +137,26 @@ fn main() {
 
     /*
 
-    When you attempt to access an element using indexing, Rust will check that the index you’ve specified is less than the array length. 
-    If the index is greater than or equal to the length, Rust will panic (program exits and displays the errors). 
+    When you attempt to access an element using indexing, Rust will check that the index you’ve specified is less than the array length.
+    If the index is greater than or equal to the length, Rust will panic (program exits and displays the errors).
     This check has to happen at runtime or at compile-time (if the out-of-bounds indexing is obvious at compile-time)
 
     */
 }
 
-/*  
+/*
 
 Rust also has 128-bit integral types: u128 and i128
+
+*/
+
+/*
+
+Number Literals         Example
+Decimal                 98_222
+Hex                     0xff
+Octal                   0o77
+Binary                  0b1111_0000
+Byte(u8 only)           b'A'
 
 */
