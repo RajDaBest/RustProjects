@@ -117,16 +117,65 @@ fn _memory_one() -> () {
     } // this scope is no longer valid, and s is no longer valid
 }
 
-/*  
+/*
 
 There is a natural point at which we can return the memory our String needs to the allocator:
 when s goes out of scope. When a variable goes out of scope, Rust calls a special function
 for us. This function is called drop, and it's where the author of String can put the
 code to return the memory. Rust calls drop automatically at the closing curly bracket.
 
-This pattern has a profound impact on the way Rust code is written. 
-It may seem simple right now, but the behavior of code can be unexpected in more complicated situations 
-when we want to have multiple variables use the data we’ve allocated on the heap. 
+This pattern has a profound impact on the way Rust code is written.
+It may seem simple right now, but the behavior of code can be unexpected in more complicated situations
+when we want to have multiple variables use the data we’ve allocated on the heap.
+
+*/
+
+/*
+
+Variables and Data interacting with Move
+
+Multiple variables can interact with the same data in different ways in Rust.
+
+*/
+
+fn _interact_integer() -> () {
+    let _x = 5;
+    let _y = _x;
+
+    // bind the value 5 to x; then make a copy of the value in x and bind it to y
+    // we then have two variables, x and y, and both equal 5
+
+    // This is indeed what is happening, because integers are simple values with a known,
+    // fixed size, and these two 5 values are pushed onto the stack.
+
+    let _s1 = String::from("hello");
+    let _s2 = _s1;
+
+    // This looks very similar, so we might assume that the way it works
+    // would be the same: that is, the second line would make a copy of the value in s1
+    // and bind it to s2. But this isn't quite what happens.
+}
+
+/*  
+
+A String is made up of three parts: a pointer to the memory that holds the contents of
+the string, a length, and a capacity. This group of data is stored on the stack.
+The length is how much memory, in bytes, the contents of the String are currently using. The
+capacity is the total amount of memory, in bytes, that the String has received from the allocator.
+The difference between length and capacity matters, but not in this context, so for now, it’s fine to ignore the capacity.
+
+When we assign s1 to s2, the String data is copied, meaning we copy the pointer, the length
+, and the capacity that are on the stack. We don't copy the data on the heap that the
+pointer refers to. If Rust instead copied the heap data as well, the operation s2 = s1 
+could be very expensive in terms of runtime performance if the data on the heap were large.
+
+Earlier, we said that when a variable goes out of scope, Rust automatically calls the drop function
+and cleans up the heap memory for that variable.
+
+This is a problem: when s2 and s1 go out of scope, they will both try to free the same 
+heap memory. This is known as a double free error and is one of the memory safety bugs.
+Freeing memory twice can lead to memory corruption, which can potentially lead to
+security vulnerabilities.
 
 */
 
