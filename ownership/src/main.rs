@@ -156,7 +156,7 @@ fn _interact_integer() -> () {
     // and bind it to s2. But this isn't quite what happens.
 }
 
-/*  
+/*
 
 A String is made up of three parts: a pointer to the memory that holds the contents of
 the string, a length, and a capacity. This group of data is stored on the stack.
@@ -166,17 +166,152 @@ The difference between length and capacity matters, but not in this context, so 
 
 When we assign s1 to s2, the String data is copied, meaning we copy the pointer, the length
 , and the capacity that are on the stack. We don't copy the data on the heap that the
-pointer refers to. If Rust instead copied the heap data as well, the operation s2 = s1 
+pointer refers to. If Rust instead copied the heap data as well, the operation s2 = s1
 could be very expensive in terms of runtime performance if the data on the heap were large.
 
 Earlier, we said that when a variable goes out of scope, Rust automatically calls the drop function
 and cleans up the heap memory for that variable.
 
-This is a problem: when s2 and s1 go out of scope, they will both try to free the same 
+This is a problem: when s2 and s1 go out of scope, they will both try to free the same
 heap memory. This is known as a double free error and is one of the memory safety bugs.
 Freeing memory twice can lead to memory corruption, which can potentially lead to
 security vulnerabilities.
 
+To ensure memory safety, after the line let s2 = s1;,
+Rust considers s1 as no longer valid.
+Therefore, Rust doesn’t need to free anything when s1 goes out of scope.
+Check out what happens when you try to use s1 after s2 is created; it won’t work.
+
 */
 
-fn main() {}
+fn _test() -> () {
+    let s1 = String::from("hello");
+    let s2 = s1;
+
+    // println!("{s1}, world!");
+    // this is an error of invalidated reference
+}
+
+/*
+
+If you’ve heard the terms shallow copy and deep copy while working with other languages,
+the concept of copying the pointer, length, and capacity without
+copying the data probably sounds like making a shallow copy.
+But because Rust also invalidates the first variable,
+instead of being called a shallow copy, it’s known as a move.
+
+That solves our problem! With only s2 valid,
+when it goes out of scope it alone will free the memory, and we’re done.
+
+In addition, there’s a design choice that’s implied by this:
+Rust will never automatically create “deep” copies of your data.
+Therefore, any automatic copying can be assumed to be inexpensive in terms of runtime performance.
+
+*/
+
+/*
+
+Variables and Data Interacting with Clone
+
+If we do want to deeply copy the heap data of the String, not just the stack data, we
+can use a common method called clone.
+
+*/
+
+fn _clone() -> () {
+    let _s1: String = String::from("hello");
+    let _s2: String = _s1.clone();
+
+    // this works just fine and the heap data does got copied.
+
+    // when u call clone, you know that some arbitrary code is being
+    // executed and that code may be expensive.
+}
+
+/*
+
+Stack-Only Data: Copy
+
+This code using integers works and is still valid:
+
+let x = 5;
+let y = x;
+
+println!("x = {x}, y = {y}");
+
+But this code seems to contradict what we just learned: we don't have a call to clone,
+but x is still valid and wasn't moved to y.
+
+The reason is that types such as integers that have a known
+size at compile time are stored entirely on the stack, so copies of the actual
+values are quick to make. That means there's no reason we would want to
+prevent x from being valid after we create the variable y. In other words, there's no
+difference between deep and shallow copying here, so calling clone wouldn't do
+anything different from the usual shallow copying, and we can leave it out.
+
+Rust has a special annotation called the Copy trait that we can place on
+types that are stored on the stack, as integers are. If a type implements the Copy trait
+, variables that use it do not move, but rather are trivially copied, making them
+still valid after assignment to another variable.
+
+Rust won't let us annotate a type with Copy, it the type, or any of it's parts, has
+implemeted the Drop trait. If the type needs something special to happen when the
+value goes out of scope and we add the Copy annotation to that type, we'll see a compile-time
+error.
+
+So, what types implement the Copy trait?
+You can check the documentation for the given type to be sure,
+but as a general rule, any group of simple scalar values can implement Copy,
+and nothing that requires allocation or is some form of resource can implement Copy.
+Here are some of the types that implement Copy:
+
+All the integer types, such as u32.
+
+The Boolean type, bool, with values true and false.
+
+All the floating-point types, such as f64.
+
+The character type, char.
+
+Tuples, if they only contain types that also implement Copy.
+For example, (i32, i32) implements Copy, but (i32, String) does not.
+*/
+
+/*
+
+Ownership and Functions
+
+The mechanics of passing a value to a function are similar to those
+when assigning a value to a variable. Passing a variable to a function will move or copy
+, just as assignment does.
+
+*/
+
+fn takes_ownership(some_string: String) { // some_string comes into scope
+    println!("{some_string}");
+} // here, some_string goes out of scope and drop is called. the backing memory is freed
+
+fn make_copy(some_integer: i32){ // some_integer comes into scope
+    println!("{some_integer}");
+} // here, some_integer goes out of scope. nothing special happens
+
+fn main() {
+    let s: String = String::from("hello"); // s comes into scope
+
+    takes_ownership(s);
+    // s's value moves into the function and so is no longer valid here
+
+    let x: i32 = 5; // x comes into scope
+
+    make_copy(x);
+    // x would move into the function, but i32 is Copy, so it's okay to still use
+    // x afterwards.
+} // here x goes out of scope, then s. But because s's value was moved, nothing special happens
+
+/*  
+
+If we tried to use s after the call to takes_ownership, Rust would throw a compile-time error.
+These static checks protect us from mistakes.
+
+*/
+
